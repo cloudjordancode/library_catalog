@@ -1,7 +1,8 @@
 class Book:
-    def __init__(self, title, author, year):
+    def __init__(self, title, author, year, pages=0):
         self.title = title
         self.author = author
+        self.pages = pages
         self.checked_out = False
 
         if not isinstance(year,int) or year <= 0:
@@ -14,12 +15,23 @@ class Book:
 
     def return_book(self):
         """Mark book as returned"""
-        self.return_book = False
+        self.checked_out = False
 
     def __repr__(self):
         status = "Checked Out" if self.checked_out else "Available"
         return f"{status} {self.title} ({self.author})"
 
+    def __eq__(self, other):
+        return self.title == other.title and self.author == other.author 
+    
+    def __lt__(self, other):
+        return self.title < other.title
+
+    def __len__(self):
+        return self.pages
+    
+    def __contains__(self, keyword):
+        return keyword.lower() in self.title.lower()
 class EBook(Book):
     def __init__(self, title, author, year, file_size):
         super().__init__(title, author, year)
@@ -77,8 +89,8 @@ class Catalog:
         print(f"Checked Out: {checked_out_books}")
 
 catalog = Catalog()
-catalog.add_book(Book("Python Crash Course", "Eric Matthes", 2019))
-catalog.add_book(Book("Clean Code", "Robert Martin", 2008))
+catalog.add_book(Book("Python Crash Course", "Eric Matthes", 2019, 544))
+catalog.add_book(Book("Clean Code", "Robert Martin", 2008, 464))
 catalog.add_book(EBook("AI Engineering", "Chip Huyen", 2025, 15.2))
 
 # Search
@@ -88,6 +100,14 @@ print(results)  # Should find "Python Crash Course"
 # Check out
 catalog.books[0].check_out()
 available = catalog.get_available()
+
+same_book = Book("Clean Code", "Robert Martin", 2008, 464)
+print(len(same_book))
+
 print(f"Available: {len(available)} books")
 
 catalog.summary()
+sorted_books = sorted(catalog.books)
+print(sorted_books)
+print(same_book == catalog.books[1])
+print("clean" in same_book)
